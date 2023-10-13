@@ -1,8 +1,43 @@
 import 'package:contacts_app/src/screens/login/home_screen.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login/flutter_login.dart';
 
 class LoginScreen extends StatelessWidget {
+  const LoginScreen({super.key});
+
+  Future<String?> _loginUser(LoginData data) async {
+    try {
+      Dio dio = Dio();
+      Response response = await dio.post(
+        'http://www.motosikletci.com/api/oturum-test',
+        data: {
+          'email': data.name,
+          'sifre': data.password,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        // API'den başarılı yanıt alındı
+        var responseData = response.data;
+        if (responseData['basari'] == 1 && responseData['durum'] == 1) {
+          print('API Response: ${responseData['mesaj']}');
+        } else {
+          // Handle incorrect API response here, for example:
+          throw Exception('API Error: ${responseData['mesaj']}');
+        }
+      } else {
+        // Handle non-200 status code
+        throw Exception('API Error: ${response.statusMessage}');
+      }
+    } catch (error) {
+      // Handle other errors, for example, network errors
+      print('Error: $error');
+      throw Exception('Error: $error');
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final inputBorder = BorderRadius.vertical(
@@ -13,16 +48,27 @@ class LoginScreen extends StatelessWidget {
     return FlutterLogin(
       title: 'AREGON',
       logo: AssetImage('assets/images/logo.png'),
-      onLogin: (_) {
-        return;
+      onLogin: (loginData) async {
+        try {
+          await _loginUser(loginData);
+
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => const HomeScreen()),
+            (route) => false,
+          );
+        } catch (error) {
+          return 'Kullanıcı adı veya şifre hatalı';
+        }
       },
-      onSubmitAnimationCompleted: () {
-        Navigator.of(context).pushReplacement(MaterialPageRoute(
-          builder: (context) => HomeScreen(),
-        ));
-      },
+      // onSubmitAnimationCompleted: () async {
+      //   Navigator.of(context).pushAndRemoveUntil(
+      //     MaterialPageRoute(builder: (_) => const HomeScreen()),
+      //     (route) => false,
+      //   );
+      // },
       onRecoverPassword: (_) {
         return;
+        // Show new password dialog
       },
       theme: LoginTheme(
         primaryColor: Colors.teal,
