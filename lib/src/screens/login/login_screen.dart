@@ -3,6 +3,9 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login/flutter_login.dart';
 
+import '../../core/model/customUser.dart';
+import '../../core/model/user_database_provider.dart';
+
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
@@ -22,6 +25,11 @@ class LoginScreen extends StatelessWidget {
         var responseData = response.data;
         if (responseData['basari'] == 1 && responseData['durum'] == 1) {
           print('API Response: ${responseData['mesaj']}');
+          CustomUser user = CustomUser(email: data.name, sifre: data.password);
+          UserDatabaseProvider databaseProvider = UserDatabaseProvider();
+          await databaseProvider.open();
+          await databaseProvider.insert(user);
+          await databaseProvider.close();
         } else {
           // Handle incorrect API response here, for example:
           throw Exception('API Error: ${responseData['mesaj']}');
