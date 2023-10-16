@@ -5,11 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:kartal/kartal.dart';
 
-import '../../core/contacts_bloc/app_bloc.dart';
-import '../../core/contacts_bloc/app_event.dart';
-import '../../core/contacts_bloc/app_state.dart';
+import '../../core/bloc/contacts_bloc/app_bloc.dart';
+import '../../core/bloc/contacts_bloc/app_state.dart';
 import '../../core/model/user_database_provider.dart';
-import '../../core/repository/contacts/user_repository.dart';
 import '../login/login_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -22,108 +20,104 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<UserBloc>(
-        create: (context) => UserBloc(
-              RepositoryProvider.of<UserRepository>(context),
-            )..add(LoadUserEvent()),
-        child: BlocBuilder<UserBloc, UserState>(
-          builder: (context, state) {
-            if (state is UserLoadingState) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            } else if (state is UserLoadedState) {
-              List<Contacts> userList = state.users;
-              return Scaffold(
-                body: Stack(
-                  children: [
-                    Positioned(
-                      child: Container(color: Color(0xff072027)),
-                    ),
-                    Positioned(
-                      top: context.general.mediaQuery.size.height * 0.035,
-                      left: context.general.mediaQuery.size.width * 0.75,
-                      right: 0,
-                      child: Row(
-                        children: [
-                          IconButton(
-                            icon: Icon(
-                              Icons.search,
-                              color: Colors.white,
-                            ),
-                            onPressed: () {
-                              showSearch(
-                                  context: context,
-                                  delegate: SearchScreen(contacts: userList));
-                            },
-                          ),
-                          IconButton(
-                            icon: Icon(
-                              Icons.exit_to_app,
-                              color: Colors.white,
-                            ),
-                            onPressed: () async {
-                              int userId = 1;
-
-                              UserDatabaseProvider databaseProvider =
-                                  UserDatabaseProvider();
-                              bool success =
-                                  await databaseProvider.deleteUser(userId);
-
-                              if (success) {
-                                Navigator.of(context).pushAndRemoveUntil(
-                                  MaterialPageRoute(
-                                      builder: (_) => const LoginScreen()),
-                                  (route) => false,
-                                );
-                              } else {
-                                print('Failed to delete user');
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                    _AddUserIconButton(),
-                    _TextAppTitle(),
-                    Positioned(
-                      top: 80,
-                      left: 0,
-                      right: 0,
-                      child: Card(
-                        color: Color(0xff003344),
-                        margin: EdgeInsets.zero,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(30),
-                            topRight: Radius.circular(30),
-                          ),
-                        ),
-                        child: Container(
-                          height: MediaQuery.of(context).size.height,
-                          child: Padding(
-                            padding: context.padding.low,
-                            child: ListView.builder(
-                              itemCount: userList.length,
-                              itemBuilder: (context, index) {
-                                final user = userList[index];
-                                return buildPadding(context, user);
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+    return BlocBuilder<UserBloc, UserState>(
+      builder: (context, state) {
+        if (state is UserLoadingState) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (state is UserLoadedState) {
+          List<Contacts> userList = state.users;
+          return Scaffold(
+            body: Stack(
+              children: [
+                Positioned(
+                  child: Container(color: Color(0xff072027)),
                 ),
-              );
-            } else {
-              return const Center(
-                child: Text('Something went wrong!'),
-              );
-            }
-          },
-        ));
+                Positioned(
+                  top: context.general.mediaQuery.size.height * 0.035,
+                  left: context.general.mediaQuery.size.width * 0.75,
+                  right: 0,
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          Icons.search,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          showSearch(
+                              context: context,
+                              delegate: SearchScreen(contacts: userList));
+                        },
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.exit_to_app,
+                          color: Colors.white,
+                        ),
+                        onPressed: () async {
+                          int userId = 1;
+
+                          UserDatabaseProvider databaseProvider =
+                              UserDatabaseProvider();
+                          bool success =
+                              await databaseProvider.deleteUser(userId);
+
+                          if (success) {
+                            Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                  builder: (_) => const LoginScreen()),
+                              (route) => false,
+                            );
+                          } else {
+                            print('Failed to delete user');
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                _AddUserIconButton(),
+                _TextAppTitle(),
+                Positioned(
+                  top: 80,
+                  left: 0,
+                  right: 0,
+                  child: Card(
+                    color: Color(0xff003344),
+                    margin: EdgeInsets.zero,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(30),
+                        topRight: Radius.circular(30),
+                      ),
+                    ),
+                    child: Container(
+                      height: MediaQuery.of(context).size.height,
+                      child: Padding(
+                        padding: context.padding.low,
+                        child: ListView.builder(
+                          itemCount: userList.length,
+                          itemBuilder: (context, index) {
+                            final user = userList[index];
+                            return buildPadding(context, user);
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        } else {
+          return const Center(
+            child: Text('Something went wrong!'),
+          );
+        }
+      },
+    );
 
     // return Scaffold(
     //   body: Center(
