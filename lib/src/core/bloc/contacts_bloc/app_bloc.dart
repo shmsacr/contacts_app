@@ -1,8 +1,8 @@
-import 'package:contacts_app/src/core/contacts_bloc/app_event.dart';
-import 'package:contacts_app/src/core/contacts_bloc/app_state.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:bloc/bloc.dart';
+import 'package:contacts_app/src/core/bloc/contacts_bloc/app_event.dart';
+import 'package:contacts_app/src/core/bloc/contacts_bloc/app_state.dart';
 
-import '../repository/contacts/user_repository.dart';
+import '../../repository/contacts/user_repository.dart';
 
 class UserBloc extends Bloc<UserEvent, UserState> {
   final UserRepository _userRepository;
