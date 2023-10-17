@@ -1,12 +1,12 @@
 import 'package:contacts_app/src/core/bloc/city_bloc/city_bloc.dart';
 import 'package:contacts_app/src/core/bloc/city_bloc/city_event.dart';
-import 'package:contacts_app/src/core/bloc/contacts_bloc/app_bloc.dart';
-import 'package:contacts_app/src/core/bloc/contacts_bloc/app_event.dart';
+import 'package:contacts_app/src/core/bloc/contacts_bloc/user_bloc.dart';
+import 'package:contacts_app/src/core/bloc/contacts_bloc/user_event.dart';
+import 'package:contacts_app/src/core/bloc/custom_user_bloc/custom_user_bloc.dart';
 import 'package:contacts_app/src/core/model/customUser.dart';
 import 'package:contacts_app/src/core/model/user_database_provider.dart';
 import 'package:contacts_app/src/core/repository/city/city_repository.dart';
-import 'package:contacts_app/src/core/repository/contacts/user_repository.dart';
-import 'package:contacts_app/src/screens/add_user/add_contact_screen.dart';
+import 'package:contacts_app/src/core/repository/custom_user/custom_user.dart';
 import 'package:contacts_app/src/screens/home/home_screen.dart'; // Import your HomeScreen
 import 'package:contacts_app/src/screens/login/login_screen.dart';
 import 'package:flutter/material.dart';
@@ -20,22 +20,24 @@ void main() async {
   Widget homeScreen = users.isNotEmpty ? HomeScreen() : LoginScreen();
 
   runApp(
-    RepositoryProvider<UserRepository>(
+    RepositoryProvider<CustomUserRepository>(
         create: (context) {
-          return UserRepository();
+          return CustomUserRepository();
         },
         child: MultiBlocProvider(providers: [
           RepositoryProvider<CityRepository>(
               create: (context) => CityRepository()),
           BlocProvider<UserBloc>(
             create: (ctx) {
-              final repository = RepositoryProvider.of<UserRepository>(ctx);
-              return UserBloc(repository)..add(LoadUserEvent());
+              return UserBloc()..add(LoadUserEvent());
             },
           ),
           BlocProvider<CityBloc>(create: (ctx) {
-            final repositoryCt = RepositoryProvider.of<CityRepository>(ctx);
-            return CityBloc(repositoryCt)..add(LoadCityEvent());
+            return CityBloc()..add(LoadCityEvent());
+          }),
+          BlocProvider<CustomUserBloc>(create: (ctx) {
+            final repository = RepositoryProvider.of<CustomUserRepository>(ctx);
+            return CustomUserBloc(repository)..add(LoadCustomUserEvent());
           }),
         ], child: MyApp(homeScreen: homeScreen))),
   );
@@ -50,7 +52,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: AddUserScreen(),
+      home: homeScreen,
     );
   }
 }
