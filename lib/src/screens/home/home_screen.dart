@@ -1,12 +1,13 @@
 import 'package:contacts_app/src/core/model/contacts.dart';
+import 'package:contacts_app/src/screens/add_user/add_contact_screen.dart';
 import 'package:contacts_app/src/screens/search/search_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:kartal/kartal.dart';
 
-import '../../core/bloc/contacts_bloc/app_bloc.dart';
-import '../../core/bloc/contacts_bloc/app_state.dart';
+import '../../core/bloc/contacts_bloc/user_bloc.dart';
+import '../../core/bloc/contacts_bloc/user_state.dart';
 import '../../core/model/user_database_provider.dart';
 import '../login/login_screen.dart';
 
@@ -177,13 +178,13 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Icon(Icons.person),
             ),
             title: Text(
-              isdata.kisi_ad,
+              isdata.kisi_ad!,
             ),
             subtitle: Text(
-              isdata.kisi_tel,
+              isdata.kisi_tel!,
               style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w600),
             ),
-            trailing: Text(isdata.city_name + " / " + isdata.town_name)),
+            trailing: Text(isdata.city_name! + " / " + isdata.town_name!)),
       ),
     );
   }
@@ -200,7 +201,12 @@ class _AddUserIconButton extends StatelessWidget {
       left: 0,
       child: IconButton(
         icon: Icon(Icons.add, color: Colors.white),
-        onPressed: () {},
+        onPressed: () {
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => const AddUserScreen()),
+            (route) => false,
+          );
+        },
       ),
     );
   }
