@@ -1,26 +1,26 @@
 import 'package:equatable/equatable.dart';
 
 class Contacts extends Equatable {
-  final int kisi_id;
-  final String kisi_ad;
-  final String kisi_tel;
-  final String resim;
-  final int cinsiyet;
-  final int city_id;
-  final int town_id;
-  final String city_name;
-  final String town_name;
+  final int? kisi_id;
+  final String? kisi_ad;
+  final String? kisi_tel;
+  final String? resim;
+  final int? cinsiyet;
+  final int? city_id;
+  final int? town_id;
+  final String? city_name;
+  final String? town_name;
 
   const Contacts({
-    required this.kisi_id,
-    required this.kisi_ad,
-    required this.kisi_tel,
-    required this.resim,
-    required this.cinsiyet,
-    required this.city_id,
-    required this.town_id,
-    required this.city_name,
-    required this.town_name,
+    this.kisi_id,
+    this.kisi_ad,
+    this.kisi_tel,
+    this.resim,
+    this.cinsiyet,
+    this.city_id,
+    this.town_id,
+    this.city_name,
+    this.town_name,
   });
 
   factory Contacts.fromJson(Map<String, dynamic> json) {
