@@ -3,14 +3,14 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 
 @immutable
-abstract class UserState extends Equatable {}
+abstract class ContactsState extends Equatable {}
 
-class UserLoadingState extends UserState {
+class UserLoadingState extends ContactsState {
   @override
   List<Object?> get props => [];
 }
 
-class UserLoadedState extends UserState {
+class UserLoadedState extends ContactsState {
   UserLoadedState(this.users);
   final List<Contacts> users;
 
@@ -18,7 +18,7 @@ class UserLoadedState extends UserState {
   List<Object?> get props => [users];
 }
 
-class UserErrorState extends UserState {
+class UserErrorState extends ContactsState {
   UserErrorState(this.message);
   final String message;
   @override

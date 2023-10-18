@@ -1,18 +1,21 @@
+import 'dart:io';
+
 import 'package:contacts_app/src/core/model/contacts.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 
 @immutable
-abstract class UserEvent extends Equatable {}
+abstract class ContactsEvent extends Equatable {}
 
-class LoadUserEvent extends UserEvent {
+class LoadUserEvent extends ContactsEvent {
   @override
   List<Object?> get props => [];
 }
 
-class PostUserEvent extends UserEvent {
+class PostUserEvent extends ContactsEvent {
   Contacts data;
-  PostUserEvent({required this.data});
+  File? file;
+  PostUserEvent({required this.data, this.file});
   @override
   List<Object?> get props => [data];
 }
