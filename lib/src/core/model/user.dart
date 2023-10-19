@@ -1,11 +1,11 @@
-class CustomUser {
+class User {
   String? email;
   String? sifre;
   int? id;
 
-  CustomUser({this.email, this.sifre, this.id});
+  User({this.email, this.sifre, this.id});
 
-  CustomUser.fromJson(Map<String, dynamic> json) {
+  User.fromJson(Map<String, dynamic> json) {
     email = json['email'];
     sifre = json['sifre'];
     id = json["id"];
