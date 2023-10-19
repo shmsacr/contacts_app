@@ -1,13 +1,13 @@
 import 'package:contacts_app/src/core/model/contacts.dart';
-import 'package:contacts_app/src/screens/add_user/add_contact_screen.dart';
+import 'package:contacts_app/src/screens/add_contact/add_contact_screen.dart';
 import 'package:contacts_app/src/screens/search/search_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:kartal/kartal.dart';
 
-import '../../core/bloc/contacts_bloc/user_bloc.dart';
-import '../../core/bloc/contacts_bloc/user_state.dart';
+import '../../core/bloc/contacts_bloc/contacts_bloc.dart';
+import '../../core/bloc/contacts_bloc/contacts_state.dart';
 import '../../core/model/user_database_provider.dart';
 import '../login/login_screen.dart';
 
@@ -21,7 +21,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<UserBloc, UserState>(
+    return BlocBuilder<ContactsBloc, ContactsState>(
       builder: (context, state) {
         if (state is UserLoadingState) {
           return const Center(
@@ -119,28 +119,6 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       },
     );
-
-    // return Scaffold(
-    //   body: Center(
-    //       child: TextButton(
-    //           onPressed: () async {
-    //             int userId = 1; // Replace this with the actual user ID
-    //
-    //             UserDatabaseProvider databaseProvider = UserDatabaseProvider();
-    //             bool success = await databaseProvider.deleteUser(userId);
-    //
-    //             if (success) {
-    //               Navigator.of(context).pushAndRemoveUntil(
-    //                 MaterialPageRoute(builder: (_) => const LoginScreen()),
-    //                 (route) => false,
-    //               );
-    //             } else {
-    //               // Handle error if user deletion fails
-    //               print('Failed to delete user');
-    //             }
-    //           },
-    //           child: Text('Logout'))),
-    // );
   }
 
   Widget buildPadding(BuildContext context, Contacts isdata) {
@@ -155,14 +133,14 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           SlidableAction(
             onPressed: (context) {
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute<AddWordScreen>(
-              //     builder: (context) => AddWordScreen(
-              //       myWords: isdata,
-              //     ),
-              //   ),
-              // );
+              Navigator.push(
+                context,
+                MaterialPageRoute<AddContactScreen>(
+                  builder: (context) => AddContactScreen(
+                    contacts: isdata,
+                  ),
+                ),
+              );
             },
             backgroundColor: Colors.orange,
             icon: Icons.edit,
@@ -184,7 +162,7 @@ class _HomeScreenState extends State<HomeScreen> {
               isdata.kisi_tel!,
               style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w600),
             ),
-            trailing: Text(isdata.city_name! + " / " + isdata.town_name!)),
+            trailing: Text(isdata.city_name + " / " + isdata.town_name)),
       ),
     );
   }
@@ -202,9 +180,8 @@ class _AddUserIconButton extends StatelessWidget {
       child: IconButton(
         icon: Icon(Icons.add, color: Colors.white),
         onPressed: () {
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (_) => const AddUserScreen()),
-            (route) => false,
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const AddContactScreen()),
           );
         },
       ),
