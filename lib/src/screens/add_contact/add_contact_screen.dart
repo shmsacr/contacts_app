@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:contacts_app/src/core/bloc/city_bloc/city_bloc.dart';
-import 'package:contacts_app/src/core/bloc/contacts_bloc/user_bloc.dart';
+import 'package:contacts_app/src/core/bloc/contacts_bloc/contacts_bloc.dart';
 import 'package:contacts_app/src/core/model/contacts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,19 +11,19 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../core/bloc/city_bloc/city_state.dart';
-import '../../core/bloc/contacts_bloc/user_event.dart';
-import '../../core/bloc/contacts_bloc/user_state.dart';
+import '../../core/bloc/contacts_bloc/contacts_event.dart';
+import '../../core/bloc/contacts_bloc/contacts_state.dart';
 import '../../core/model/city.dart';
 
-class AddUserScreen extends StatefulWidget {
+class AddContactScreen extends StatefulWidget {
   final Contacts? contacts;
-  const AddUserScreen({this.contacts, Key? key}) : super(key: key);
+  const AddContactScreen({this.contacts, Key? key}) : super(key: key);
 
   @override
-  State<AddUserScreen> createState() => _AddUserScreenState();
+  State<AddContactScreen> createState() => _AddContactScreenState();
 }
 
-class _AddUserScreenState extends State<AddUserScreen> {
+class _AddContactScreenState extends State<AddContactScreen> {
   final _formKey = GlobalKey<FormBuilderState>();
   final _phoneNumberController = TextEditingController();
   late TextEditingController _controller;
@@ -48,7 +48,8 @@ class _AddUserScreenState extends State<AddUserScreen> {
   }
 
   Future<void> upLoadCamere() async {
-    XFile? getFile = await ImagePicker().pickImage(source: ImageSource.camera);
+    XFile? getFile = await ImagePicker()
+        .pickImage(source: ImageSource.camera, imageQuality: 1);
     setState(() {
       _uploadFile = File(getFile!.path);
     });
@@ -65,7 +66,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Add Contact"),
+          title: Text(widget.contacts != null ? "Add Contact" : "Edit Contact"),
           centerTitle: true,
         ),
         body: Padding(
@@ -78,6 +79,9 @@ class _AddUserScreenState extends State<AddUserScreen> {
                   Stack(
                     children: [
                       CircleAvatar(
+                        backgroundColor: widget.contacts?.cinsiyet == 2
+                            ? Colors.pinkAccent
+                            : Colors.blueAccent,
                         radius: 70,
                         child: _uploadFile != null
                             ? ClipOval(
@@ -139,7 +143,8 @@ class _AddUserScreenState extends State<AddUserScreen> {
                           inputFormatters: [PhoneInputFormatter()],
                           decoration: const InputDecoration(
                               border: OutlineInputBorder(),
-                              labelText: 'Telefon Numarası'),
+                              labelText: "+90${widget.contacts?.kisi_tel}" ??
+                                  'Telefon Numarası'),
                           validator: FormBuilderValidators.compose([
                             FormBuilderValidators.required(
                                 errorText: "Bu alan boş bırakılamaz."),
@@ -153,88 +158,80 @@ class _AddUserScreenState extends State<AddUserScreen> {
                         SizedBox(
                           height: 20,
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Container(
-                              height: 65.0,
-                              width: 150.0,
-                              child: BlocBuilder<CityBloc, CityState>(
-                                builder: (context, state) {
-                                  if (state is CityLoadingState) {
-                                    return const Center(
-                                        child: CircularProgressIndicator());
-                                  } else if (state is CityLoadedState) {
-                                    List<City> cityOptions = state.cities;
-                                    return FormBuilderDropdown<City>(
-                                      name: 'city',
-                                      validator: FormBuilderValidators.compose(
-                                        [
-                                          FormBuilderValidators.required(
-                                              errorText:
-                                                  "Bu alan boş bırakılamaz."),
-                                        ],
-                                      ),
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 12,
-                                      ),
-                                      decoration: InputDecoration(
-                                        labelText: 'City',
-                                        suffix: IconButton(
-                                          icon: const Icon(Icons.close),
-                                          onPressed: () {
-                                            _formKey
-                                                .currentState!.fields['city']
-                                                ?.reset();
-                                          },
-                                        ),
-                                        hintText: 'Select City',
-                                      ),
-                                      isExpanded: true,
-                                      items: cityOptions
-                                          .map((city) => DropdownMenuItem<City>(
-                                                alignment:
-                                                    AlignmentDirectional.center,
-                                                value: city,
-                                                child: Text(city.city_name),
-                                              ))
-                                          .toList(),
-                                      onChanged: (value) {
-                                        setState(() {
-                                          selectedCity = value!.city_id;
-                                        });
-                                        print(selectedCity.toString());
-                                      },
-                                    );
-                                  } else {
-                                    return const Center(child: Text("Error"));
-                                  }
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                        BlocBuilder<UserBloc, UserState>(
+                        BlocBuilder<CityBloc, CityState>(
                           builder: (context, state) {
-                            return MaterialButton(
-                                onPressed: () {
+                            if (state is CityLoadingState) {
+                              return const Center(
+                                  child: CircularProgressIndicator());
+                            } else if (state is CityLoadedState) {
+                              List<City> cityOptions = state.cities;
+                              return SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.08,
+                                child: FormBuilderDropdown<City>(
+                                  name: 'city',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 16,
+                                  ),
+                                  decoration: InputDecoration(
+                                    labelText: 'City',
+                                    suffix: IconButton(
+                                      icon: const Icon(Icons.close),
+                                      onPressed: () {
+                                        _formKey.currentState!.fields['city']
+                                            ?.reset();
+                                      },
+                                    ),
+                                    hintText: widget.contacts?.city_name ??
+                                        "Select city",
+                                  ),
+                                  isExpanded: true,
+                                  items: cityOptions
+                                      .map((city) => DropdownMenuItem<City>(
+                                            alignment:
+                                                AlignmentDirectional.center,
+                                            value: city,
+                                            child: Text(city.city_name),
+                                          ))
+                                      .toList(),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      selectedCity = value!.city_id;
+                                    });
+                                    print(selectedCity.toString());
+                                  },
+                                ),
+                              );
+                            } else {
+                              return const Center(child: Text("Error"));
+                            }
+                          },
+                        ),
+                        SizedBox(
+                          height: 30,
+                        ),
+                        BlocBuilder<ContactsBloc, ContactsState>(
+                          builder: (context, state) {
+                            return ElevatedButton(
+                                onPressed: () async {
                                   if (_formKey.currentState
                                           ?.saveAndValidate() ??
                                       false) {
                                     final Contacts user = Contacts.fromJson({
                                       'kisi_ad':
                                           _formKey.currentState!.value["name"],
-                                      'kisi_id': 0,
-                                      'city_id': selectedCity,
-                                      'town_id': 1,
+                                      'kisi_id': widget.contacts?.kisi_id ?? 0,
+                                      'city_id':
+                                          widget.contacts?.city_id ?? 2175,
+                                      'town_id':
+                                          widget.contacts?.town_id ?? 2175,
                                       'kisi_tel': _phoneNumberController.text,
-                                      'resim': _uploadFile.toString(),
                                     });
                                     try {
-                                      context
-                                          .read<UserBloc>()
-                                          .add(PostUserEvent(data: user));
+                                      context.read<ContactsBloc>().add(
+                                          PostUserEvent(
+                                              data: user, file: _uploadFile!));
                                       if (context.mounted) {
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(
@@ -253,9 +250,12 @@ class _AddUserScreenState extends State<AddUserScreen> {
                                     debugPrint('Invalid');
                                   }
                                 },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green,
+                                ),
                                 child: const Text(
                                   'Create',
-                                  style: TextStyle(color: Colors.red),
+                                  style: TextStyle(color: Colors.white),
                                 ));
                           },
                         )
