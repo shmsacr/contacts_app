@@ -1,5 +1,6 @@
-import 'package:contacts_app/src/core/model/contacts.dart';
 import 'package:flutter/material.dart';
+
+import '../../core/data/model/contacts.dart';
 
 class SearchScreen extends SearchDelegate<Contacts> {
   final List<Contacts> contacts;
@@ -43,21 +44,12 @@ class SearchScreen extends SearchDelegate<Contacts> {
 
   @override
   Widget buildResults(BuildContext context) {
-    List<Contacts> matchQuery = [];
-    for (var fruit in contacts) {
-      if ((fruit.kisi_ad!.toLowerCase().contains(query.toLowerCase()) ||
-              fruit.city_name!.toLowerCase().contains(query.toLowerCase())) &&
-          (query.toLowerCase().contains('erkek') && fruit.cinsiyet == 1 ||
-              query.toLowerCase().contains('kadın') && fruit.cinsiyet == 2)) {
-        matchQuery.add(fruit);
-      }
-    }
     return StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
       return ListView.builder(
-          itemCount: matchQuery.length,
+          itemCount: contacts.length,
           itemBuilder: (context, index) {
-            final isdata = matchQuery[index];
+            final isdata = contacts[index];
             return Card(
               elevation: 10,
               child: ListTile(
@@ -68,10 +60,10 @@ class SearchScreen extends SearchDelegate<Contacts> {
                     child: Icon(Icons.person),
                   ),
                   title: Text(
-                    isdata.kisi_ad!,
+                    isdata.kisi_ad,
                   ),
                   subtitle: Text(
-                    isdata.kisi_tel!,
+                    isdata.kisi_tel,
                     style: const TextStyle(
                         color: Colors.grey, fontWeight: FontWeight.w600),
                   ),
@@ -86,11 +78,17 @@ class SearchScreen extends SearchDelegate<Contacts> {
   Widget buildSuggestions(BuildContext context) {
     // TODO: implement buildSuggestions
     List<Contacts> matchQuery = [];
+
     for (var fruit in contacts) {
-      if ((fruit.kisi_ad!.toLowerCase().contains(query.toLowerCase()) ||
-              fruit.city_name!.toLowerCase().contains(query.toLowerCase())) &&
-          (query.toLowerCase().contains('erkek') && fruit.cinsiyet == 1 ||
-              query.toLowerCase().contains('kadın') && fruit.cinsiyet == 2)) {
+      var nameMatch =
+          fruit.kisi_ad.toLowerCase().startsWith(query.toLowerCase());
+      var cityMatch =
+          fruit.city_name!.toLowerCase().startsWith(query.toLowerCase());
+      var genderMatch =
+          (query.toLowerCase().startsWith("erkek") && fruit.cinsiyet == 1) ||
+              (query.toLowerCase().startsWith("kadin") && fruit.cinsiyet == 2);
+
+      if (nameMatch || cityMatch || genderMatch) {
         matchQuery.add(fruit);
       }
     }
@@ -110,10 +108,10 @@ class SearchScreen extends SearchDelegate<Contacts> {
                     child: Icon(Icons.person),
                   ),
                   title: Text(
-                    isdata.kisi_ad!,
+                    isdata.kisi_ad,
                   ),
                   subtitle: Text(
-                    isdata.kisi_tel!,
+                    isdata.kisi_tel,
                     style: TextStyle(
                         color: Colors.grey, fontWeight: FontWeight.w600),
                   ),
