@@ -1,10 +1,11 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:contacts_app/src/core/model/user.dart';
-import 'package:contacts_app/src/core/repository/user/user_repository/user_repository.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
+
+import '../../data/model/user.dart';
+import '../../data/repository/user/user_repository/user_repository.dart';
 
 part 'authenctication_event.dart';
 part 'authenctication_state.dart';
@@ -40,7 +41,16 @@ class AuthenticationBloc
   }
 
   FutureOr<void> _mapUserLoggedOutToState(
-      LoggedOutEvent event, Emitter<AuthenticationState> emit) {}
+      LoggedOutEvent event, Emitter<AuthenticationState> emit) {
+    try {
+      final signOut = userRepository.singOut();
+      if (signOut == true) {
+        emit(AuthenticationNotAuthenticated());
+      }
+    } catch (e) {
+      throw Exception("Kullanıcı silinemedi");
+    }
+  }
 // @override
 // Stream<AuthenticationState> mapEventToState(
 //     AuthenticationEvent event) async* {

@@ -25,7 +25,10 @@ class AuthenticationSuccess extends AuthenticationState {
   List<Object> get props => [data];
 }
 
-class AuthenticationNotAuthenticated extends AuthenticationState {}
+class AuthenticationNotAuthenticated extends AuthenticationState {
+  @override
+  List<Object> get props => [];
+}
 
 class AuthenticationFailure extends AuthenticationState {
   final String error;
