@@ -1,13 +1,12 @@
-import 'package:contacts_app/src/core/repository/user/user_repository/user_repository.dart';
+import 'package:contacts_app/src/core/bloc/authentication/authenctication_bloc.dart';
+import 'package:contacts_app/src/core/bloc/login/login_bloc.dart';
+import 'package:contacts_app/src/core/data/model/user.dart';
+import 'package:contacts_app/src/core/data/repository/user/user_repository/user_repository.dart';
+import 'package:contacts_app/src/screens/home/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart' show timeDilation;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_login/flutter_login.dart';
-
-import '../../core/bloc/authentication/authenctication_bloc.dart';
-import '../../core/bloc/login/login_bloc.dart';
-import '../../core/model/user.dart';
-import '../home/home_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -49,11 +48,6 @@ class _FlutterLogin extends StatelessWidget {
             content: Text(state.error.toString()),
             backgroundColor: Colors.red,
           ));
-        else if (state is LoginSuccess) {
-          Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (_) => const HomeScreen()),
-              (route) => false);
-        }
       },
       child: BlocBuilder<LoginBloc, LoginState>(
         builder: (context, state) {
@@ -63,14 +57,11 @@ class _FlutterLogin extends StatelessWidget {
             onLogin: (loginData) {
               return _loginUser(context, loginData);
             },
-            // onSubmitAnimationCompleted: () async {
-            //   if (state is LoginFailure) {
-            //     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            //       content: Text('Kullanıcı adı veya şifre hatalı'),
-            //       backgroundColor: Colors.red,
-            //     ));
-            //   }
-            // },
+            onSubmitAnimationCompleted: () async {
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (_) => const HomeScreen()),
+                  (route) => false);
+            },
             onRecoverPassword: (_) {
               return;
               // Show new password dialog
