@@ -2,22 +2,20 @@ import 'dart:io';
 
 import 'package:contacts_app/src/core/bloc/city_bloc/city_bloc.dart';
 import 'package:contacts_app/src/core/bloc/contacts_bloc/contacts_bloc.dart';
-import 'package:contacts_app/src/core/model/contacts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../core/bloc/city_bloc/city_state.dart';
 import '../../core/bloc/contacts_bloc/contacts_event.dart';
 import '../../core/bloc/contacts_bloc/contacts_state.dart';
-import '../../core/model/city.dart';
+import '../../core/data/model/city.dart';
+import '../../core/data/model/contacts.dart';
 
 class AddContactScreen extends StatefulWidget {
-  final Contacts? contacts;
-  const AddContactScreen({this.contacts, Key? key}) : super(key: key);
+  const AddContactScreen({Key? key}) : super(key: key);
 
   @override
   State<AddContactScreen> createState() => _AddContactScreenState();
@@ -25,7 +23,7 @@ class AddContactScreen extends StatefulWidget {
 
 class _AddContactScreenState extends State<AddContactScreen> {
   final _formKey = GlobalKey<FormBuilderState>();
-  final _phoneNumberController = TextEditingController();
+  var _phoneNumberController = TextEditingController();
   late TextEditingController _controller;
   List<String> genderOptions = ['Male', 'Female', 'Other'];
   File? _uploadFile;
@@ -34,16 +32,12 @@ class _AddContactScreenState extends State<AddContactScreen> {
   void initState() {
     super.initState();
     _controller = TextEditingController();
-    PhoneInputFormatter.replacePhoneMask(
-      countryCode: 'TR',
-      newMask: '+00 (000) 000 00 00',
-    );
   }
 
   @override
   void dispose() {
-    _controller.dispose();
     _formKey.currentState?.reset();
+    _phoneNumberController.dispose();
     super.dispose();
   }
 
@@ -66,7 +60,8 @@ class _AddContactScreenState extends State<AddContactScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(widget.contacts != null ? "Add Contact" : "Edit Contact"),
+          backgroundColor: Color(0xff003344),
+          title: Text("Add Contact"),
           centerTitle: true,
         ),
         body: Padding(
@@ -79,9 +74,6 @@ class _AddContactScreenState extends State<AddContactScreen> {
                   Stack(
                     children: [
                       CircleAvatar(
-                        backgroundColor: widget.contacts?.cinsiyet == 2
-                            ? Colors.pinkAccent
-                            : Colors.blueAccent,
                         radius: 70,
                         child: _uploadFile != null
                             ? ClipOval(
@@ -117,44 +109,10 @@ class _AddContactScreenState extends State<AddContactScreen> {
                         SizedBox(
                           height: 16,
                         ),
-                        FormBuilderTextField(
-                          name: "name",
-                          initialValue: widget.contacts?.kisi_ad,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Kisi Ad',
-                            fillColor: Colors.white,
-                            filled: true,
-                          ),
-                          validator: FormBuilderValidators.compose(
-                            [
-                              FormBuilderValidators.required(
-                                  errorText: "Bu alan boş bırakılamaz."),
-                            ],
-                          ),
-                          onEditingComplete: () {
-                            FocusScope.of(context).nextFocus();
-                          },
-                        ),
+                        _NameFormBuilder(),
                         const SizedBox(height: 16.0),
-                        FormBuilderTextField(
-                          controller: _phoneNumberController,
-                          name: 'phoneNumber',
-                          inputFormatters: [PhoneInputFormatter()],
-                          decoration: const InputDecoration(
-                              border: OutlineInputBorder(),
-                              labelText: "+90${widget.contacts?.kisi_tel}" ??
-                                  'Telefon Numarası'),
-                          validator: FormBuilderValidators.compose([
-                            FormBuilderValidators.required(
-                                errorText: "Bu alan boş bırakılamaz."),
-                            FormBuilderValidators.equalLength(
-                              19,
-                              errorText:
-                                  "Doğru formatta bir telefon numarası giriniz.",
-                            ),
-                          ]),
-                        ),
+                        _PhoneFormBuilder(
+                            phoneNumberController: _phoneNumberController),
                         SizedBox(
                           height: 20,
                         ),
@@ -175,7 +133,20 @@ class _AddContactScreenState extends State<AddContactScreen> {
                                     fontSize: 16,
                                   ),
                                   decoration: InputDecoration(
+                                    fillColor: Colors.white,
+                                    border: OutlineInputBorder(),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: Colors.blueAccent,
+                                        width: 3,
+                                      ),
+                                    ),
+                                    filled: true,
                                     labelText: 'City',
+                                    labelStyle: TextStyle(
+                                      color: Color(0xff072027),
+                                      fontSize: 25,
+                                    ),
                                     suffix: IconButton(
                                       icon: const Icon(Icons.close),
                                       onPressed: () {
@@ -183,8 +154,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                                             ?.reset();
                                       },
                                     ),
-                                    hintText: widget.contacts?.city_name ??
-                                        "Select city",
+                                    hintText: "Select city",
                                   ),
                                   isExpanded: true,
                                   items: cityOptions
@@ -221,31 +191,40 @@ class _AddContactScreenState extends State<AddContactScreen> {
                                     final Contacts user = Contacts.fromJson({
                                       'kisi_ad':
                                           _formKey.currentState!.value["name"],
-                                      'kisi_id': widget.contacts?.kisi_id ?? 0,
-                                      'city_id':
-                                          widget.contacts?.city_id ?? 2175,
-                                      'town_id':
-                                          widget.contacts?.town_id ?? 2175,
+                                      'kisi_id': 0,
+                                      'city_id': 12049,
+                                      'town_id': 2175,
                                       'kisi_tel': _phoneNumberController.text,
                                     });
-                                    try {
-                                      context.read<ContactsBloc>().add(
-                                          PostUserEvent(
-                                              data: user, file: _uploadFile!));
-                                      if (context.mounted) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                              content: Text(
-                                                  "User created: ${user.kisi_ad}")),
-                                        );
-                                      }
-                                    } catch (e) {
-                                      debugPrint(e.toString());
+                                    context.read<ContactsBloc>().add(
+                                        PostUserEvent(
+                                            data: user, file: _uploadFile));
+                                    final state = await context
+                                        .read<ContactsBloc>()
+                                        .stream
+                                        .firstWhere((state) =>
+                                            state is ContactsSuccessState ||
+                                            state is ContactsErrorState);
+                                    if (state is ContactsSuccessState) {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
-                                              SnackBar(content: Text("$e")));
+                                        SnackBar(
+                                            content: Text(
+                                          "User created: ${user.kisi_ad}",
+                                        )),
+                                      );
+                                    } else if (state is ContactsErrorState) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                            content: Text(
+                                          state.toString(),
+                                        )),
+                                      );
                                     }
+                                    context
+                                        .read<ContactsBloc>()
+                                        .add(LoadUserEvent());
                                   } else {
                                     debugPrint('Invalid');
                                   }
@@ -253,7 +232,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.green,
                                 ),
-                                child: const Text(
+                                child: Text(
                                   'Create',
                                   style: TextStyle(color: Colors.white),
                                 ));
@@ -285,8 +264,8 @@ class _AddContactScreenState extends State<AddContactScreen> {
                   onTap: () {
                     upLoadCamere();
                   },
-                  child: Row(
-                    children: const [
+                  child: const Row(
+                    children: [
                       Padding(
                         padding: EdgeInsets.all(4.0),
                         child: Icon(
@@ -305,8 +284,8 @@ class _AddContactScreenState extends State<AddContactScreen> {
                   onTap: () {
                     upLoadGallery();
                   },
-                  child: Row(
-                    children: const [
+                  child: const Row(
+                    children: [
                       Padding(
                         padding: EdgeInsets.all(4.0),
                         child: Icon(
@@ -326,6 +305,84 @@ class _AddContactScreenState extends State<AddContactScreen> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _PhoneFormBuilder extends StatelessWidget {
+  const _PhoneFormBuilder({
+    super.key,
+    required TextEditingController phoneNumberController,
+  }) : _phoneNumberController = phoneNumberController;
+
+  final TextEditingController _phoneNumberController;
+
+  @override
+  Widget build(BuildContext context) {
+    return FormBuilderTextField(
+      controller: _phoneNumberController,
+      name: 'phoneNumber',
+      decoration: const InputDecoration(
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.blueAccent,
+            width: 3,
+          ),
+        ),
+        fillColor: Colors.white,
+        filled: true,
+        border: OutlineInputBorder(),
+        labelText: 'Telefon Numarası',
+        labelStyle: TextStyle(
+            color: Color(0xff072027),
+            fontSize: 25,
+            fontWeight: FontWeight.bold),
+      ),
+      validator: FormBuilderValidators.compose([
+        FormBuilderValidators.required(errorText: "Bu alan boş bırakılamaz."),
+        FormBuilderValidators.equalLength(
+          10,
+          errorText: "10 Haneli telefon numarası giriniz.",
+        ),
+      ]),
+    );
+  }
+}
+
+class _NameFormBuilder extends StatelessWidget {
+  const _NameFormBuilder({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return FormBuilderTextField(
+      name: "name",
+      decoration: const InputDecoration(
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.blueAccent,
+            width: 3,
+          ),
+        ),
+        border: OutlineInputBorder(),
+        fillColor: Colors.white,
+        filled: true,
+        labelText: 'Kisi Adı',
+        labelStyle: TextStyle(
+          color: Color(0xff072027),
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      validator: FormBuilderValidators.compose(
+        [
+          FormBuilderValidators.required(errorText: "Bu alan boş bırakılamaz."),
+        ],
+      ),
+      onEditingComplete: () {
+        FocusScope.of(context).nextFocus();
+      },
     );
   }
 }
