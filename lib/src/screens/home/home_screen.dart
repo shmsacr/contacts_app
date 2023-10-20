@@ -1,4 +1,5 @@
-import 'package:contacts_app/src/core/model/contacts.dart';
+import 'package:contacts_app/src/core/bloc/authentication/authenctication_bloc.dart';
+import 'package:contacts_app/src/core/bloc/contacts_bloc/contacts_event.dart';
 import 'package:contacts_app/src/screens/add_contact/add_contact_screen.dart';
 import 'package:contacts_app/src/screens/search/search_screen.dart';
 import 'package:flutter/material.dart';
@@ -6,10 +7,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:kartal/kartal.dart';
 
-import '../../core/bloc/contacts_bloc/contacts_bloc.dart';
-import '../../core/bloc/contacts_bloc/contacts_state.dart';
-import '../../core/model/user_database_provider.dart';
-import '../login/login_screen.dart';
+import 'package:contacts_app/src/core/bloc/contacts_bloc/contacts_bloc.dart';
+import 'package:contacts_app/src/core/bloc/contacts_bloc/contacts_state.dart';
+import 'package:contacts_app/src/core/data/model/contacts.dart';
+import 'package:contacts_app/src/screens/login/login_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -23,11 +24,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return BlocBuilder<ContactsBloc, ContactsState>(
       builder: (context, state) {
-        if (state is UserLoadingState) {
+        if (state is ContactsLoadingState) {
           return const Center(
             child: CircularProgressIndicator(),
           );
-        } else if (state is UserLoadedState) {
+        } else if (state is ContactsLoadedState) {
           List<Contacts> userList = state.users;
           return Scaffold(
             body: Stack(
@@ -35,50 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Positioned(
                   child: Container(color: Color(0xff072027)),
                 ),
-                Positioned(
-                  top: context.general.mediaQuery.size.height * 0.035,
-                  left: context.general.mediaQuery.size.width * 0.75,
-                  right: 0,
-                  child: Row(
-                    children: [
-                      IconButton(
-                        icon: Icon(
-                          Icons.search,
-                          color: Colors.white,
-                        ),
-                        onPressed: () {
-                          showSearch(
-                              context: context,
-                              delegate: SearchScreen(contacts: userList));
-                        },
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          Icons.exit_to_app,
-                          color: Colors.white,
-                        ),
-                        onPressed: () async {
-                          int userId = 1;
-
-                          UserDatabaseProvider databaseProvider =
-                              UserDatabaseProvider();
-                          bool success =
-                              await databaseProvider.deleteUser(userId);
-
-                          if (success) {
-                            Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                  builder: (_) => const LoginScreen()),
-                              (route) => false,
-                            );
-                          } else {
-                            print('Failed to delete user');
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                ),
+                _Positioned(userList: userList),
                 _AddUserIconButton(),
                 _TextAppTitle(),
                 Positioned(
@@ -127,24 +85,10 @@ class _HomeScreenState extends State<HomeScreen> {
         motion: ScrollMotion(),
         children: [
           SlidableAction(
-            onPressed: (_) {},
+            onPressed: (_) => _showAlertDialog(context, isdata),
             backgroundColor: Colors.red,
             icon: Icons.delete,
-          ),
-          SlidableAction(
-            onPressed: (context) {
-              Navigator.push(
-                context,
-                MaterialPageRoute<AddContactScreen>(
-                  builder: (context) => AddContactScreen(
-                    contacts: isdata,
-                  ),
-                ),
-              );
-            },
-            backgroundColor: Colors.orange,
-            icon: Icons.edit,
-          ),
+          )
         ],
       ),
       child: Card(
@@ -156,13 +100,90 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Icon(Icons.person),
             ),
             title: Text(
-              isdata.kisi_ad!,
+              isdata.kisi_ad,
             ),
             subtitle: Text(
-              isdata.kisi_tel!,
+              isdata.kisi_tel,
               style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w600),
             ),
-            trailing: Text(isdata.city_name + " / " + isdata.town_name)),
+            trailing: Text(isdata.city_name! + " / " + isdata.town_name!)),
+      ),
+    );
+  }
+
+  _showAlertDialog(BuildContext context, Contacts isdata) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Kişi Sil"),
+          content: Text("Kişiyi silmek istediğinize emin misiniz?"),
+          actions: [
+            TextButton(
+              child: Text("İptal"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text("Sil"),
+              onPressed: () async {
+                BlocProvider.of<ContactsBloc>(context)
+                    .add(DeleteUserEvent(data: isdata));
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _Positioned extends StatelessWidget {
+  const _Positioned({
+    super.key,
+    required this.userList,
+  });
+
+  final List<Contacts> userList;
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      top: context.general.mediaQuery.size.height * 0.035,
+      left: context.general.mediaQuery.size.width * 0.75,
+      right: 0,
+      child: Row(
+        children: [
+          IconButton(
+            icon: Icon(
+              Icons.search,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              showSearch(
+                  context: context,
+                  delegate: SearchScreen(contacts: userList));
+            },
+          ),
+          IconButton(
+            icon: Icon(
+              Icons.exit_to_app,
+              color: Colors.white,
+            ),
+            onPressed: () async {
+              AuthenticationBloc authBloc =
+                  BlocProvider.of<AuthenticationBloc>(context);
+              authBloc.add(LoggedOutEvent());
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (_) => const LoginScreen(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
