@@ -1,7 +1,7 @@
-import 'package:contacts_app/src/core/model/user.dart';
-import 'package:contacts_app/src/core/model/user_database_provider.dart';
 import 'package:dio/dio.dart';
 
+import '../../../model/user.dart';
+import '../../database/database_repository_impl.dart';
 import 'user_repository.dart';
 
 class UserRepositoryImpl implements UserRepository {
@@ -17,7 +17,7 @@ class UserRepositoryImpl implements UserRepository {
       var responseData = response.data;
       if (responseData["basari"] == 1 && responseData["durum"] == 1) {
         User user = User(email: loginData.email, sifre: loginData.sifre, id: 1);
-        UserDatabaseProvider databaseProvider = UserDatabaseProvider();
+        DatabaseRepositoryImpl databaseProvider = DatabaseRepositoryImpl();
         await databaseProvider.open();
         await databaseProvider.insert(user);
         await databaseProvider.close();
@@ -32,7 +32,7 @@ class UserRepositoryImpl implements UserRepository {
 
   @override
   Future<void> singOut() {
-    UserDatabaseProvider databaseProvider = UserDatabaseProvider();
+    DatabaseRepositoryImpl databaseProvider = DatabaseRepositoryImpl();
     return databaseProvider.deleteUser(1);
     // TODO: implement singOut
     throw UnimplementedError();
@@ -40,6 +40,9 @@ class UserRepositoryImpl implements UserRepository {
 
   @override
   Future<User?> getCurrentUser() async {
-    return null;
+    DatabaseRepositoryImpl databaseProvider = DatabaseRepositoryImpl();
+    await databaseProvider.open();
+    User? currentUser = await databaseProvider.getUserById(1);
+    return currentUser;
   }
 }

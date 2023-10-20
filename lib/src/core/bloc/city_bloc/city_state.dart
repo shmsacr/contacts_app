@@ -1,5 +1,6 @@
-import 'package:contacts_app/src/core/model/city.dart';
 import 'package:equatable/equatable.dart';
+
+import '../../data/model/city.dart';
 
 abstract class CityState extends Equatable {}
 
