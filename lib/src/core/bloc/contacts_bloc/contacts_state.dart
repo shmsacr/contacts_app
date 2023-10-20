@@ -1,25 +1,36 @@
-import 'package:contacts_app/src/core/model/contacts.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 
-@immutable
-abstract class ContactsState extends Equatable {}
+import '../../data/model/contacts.dart';
 
-class UserLoadingState extends ContactsState {
+@immutable
+abstract class ContactsState extends Equatable {
   @override
   List<Object?> get props => [];
 }
 
-class UserLoadedState extends ContactsState {
-  UserLoadedState(this.users);
+class ContactsLoadingState extends ContactsState {
+  @override
+  List<Object?> get props => [];
+}
+
+class ContactsLoadedState extends ContactsState {
+  ContactsLoadedState(this.users);
   final List<Contacts> users;
 
   @override
   List<Object?> get props => [users];
 }
 
-class UserErrorState extends ContactsState {
-  UserErrorState(this.message);
+class ContactsSuccessState extends ContactsState {
+  @override
+  List<Object?> get props => [];
+}
+
+class ContactsCreateState extends ContactsState {}
+
+class ContactsErrorState extends ContactsState {
+  ContactsErrorState(this.message);
   final String message;
   @override
   List<Object?> get props => [message];
