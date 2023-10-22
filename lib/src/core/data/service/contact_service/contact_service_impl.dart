@@ -17,12 +17,17 @@ class ContactServiceImpl implements ContactService {
       'sifre': user.sifre,
     });
     if (response.statusCode == 200) {
+      var responseData = response.data;
       print("${response.data["kisiler"]["data"]}");
-      final List<Map<String, dynamic>> responseData =
-          List<Map<String, dynamic>>.from(response.data["kisiler"]["data"]);
-      final List<Contacts> users =
-          responseData.map((map) => Contacts.fromJson(map)).toList();
-      return users;
+      if (responseData["basari"] == 1 && responseData["durum"] == 1) {
+        final List<Map<String, dynamic>> responseData =
+            List<Map<String, dynamic>>.from(response.data["kisiler"]["data"]);
+        final List<Contacts> users =
+            responseData.map((map) => Contacts.fromJson(map)).toList();
+        return users;
+      } else {
+        throw ('Error uploading user data: ${response.data}');
+      }
     } else {
       throw Exception("Error");
     }
