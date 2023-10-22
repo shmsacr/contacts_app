@@ -11,8 +11,10 @@ import 'package:image_picker/image_picker.dart';
 import '../../core/bloc/city_bloc/city_state.dart';
 import '../../core/bloc/contacts_bloc/contacts_event.dart';
 import '../../core/bloc/contacts_bloc/contacts_state.dart';
+import '../../core/bloc/town_bloc.dart';
 import '../../core/data/model/city.dart';
 import '../../core/data/model/contacts.dart';
+import '../../core/data/model/town.dart';
 
 class AddContactScreen extends StatefulWidget {
   const AddContactScreen({Key? key}) : super(key: key);
@@ -28,6 +30,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
   List<String> genderOptions = ['Male', 'Female', 'Other'];
   File? _uploadFile;
   late int selectedCity;
+  late int selectedTown;
   @override
   void initState() {
     super.initState();
@@ -116,70 +119,157 @@ class _AddContactScreenState extends State<AddContactScreen> {
                         SizedBox(
                           height: 20,
                         ),
-                        BlocBuilder<CityBloc, CityState>(
-                          builder: (context, state) {
-                            if (state is CityLoadingState) {
-                              return const Center(
-                                  child: CircularProgressIndicator());
-                            } else if (state is CityLoadedState) {
-                              List<City> cityOptions = state.cities;
-                              return SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.08,
-                                child: FormBuilderDropdown<City>(
-                                  name: 'city',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 16,
-                                  ),
-                                  decoration: InputDecoration(
-                                    fillColor: Colors.white,
-                                    border: OutlineInputBorder(),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Colors.blueAccent,
-                                        width: 3,
+                        Row(
+                          children: [
+                            Container(
+                              height:
+                                  MediaQuery.of(context).size.height * 0.065,
+                              width: MediaQuery.of(context).size.width / 2.2,
+                              child: BlocBuilder<CityBloc, CityState>(
+                                builder: (context, state) {
+                                  if (state is CityLoadingState) {
+                                    return const Center(
+                                        child: CircularProgressIndicator());
+                                  } else if (state is CityLoadedState) {
+                                    List<City> cityOptions = state.cities;
+                                    return SizedBox(
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.08,
+                                      child: FormBuilderDropdown<City>(
+                                        name: 'city',
+                                        style: const TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 16,
+                                        ),
+                                        decoration: InputDecoration(
+                                          fillColor: Colors.white,
+                                          border: OutlineInputBorder(),
+                                          focusedBorder:
+                                              const OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                              color: Colors.blueAccent,
+                                              width: 3,
+                                            ),
+                                          ),
+                                          filled: true,
+                                          labelText: 'City',
+                                          labelStyle: const TextStyle(
+                                            color: Color(0xff072027),
+                                            fontSize: 25,
+                                          ),
+                                          suffix: IconButton(
+                                            icon: const Icon(Icons.close),
+                                            onPressed: () {
+                                              _formKey
+                                                  .currentState!.fields['city']
+                                                  ?.reset();
+                                            },
+                                          ),
+                                          hintText: "Select city",
+                                        ),
+                                        isExpanded: true,
+                                        items: cityOptions
+                                            .map((city) =>
+                                                DropdownMenuItem<City>(
+                                                  alignment:
+                                                      AlignmentDirectional
+                                                          .center,
+                                                  value: city,
+                                                  child: Text(city.city_name),
+                                                ))
+                                            .toList(),
+                                        onChanged: (value) {
+                                          setState(() {
+                                            selectedCity = value!.city_id;
+                                            BlocProvider.of<TownBloc>(context)
+                                                .add(LoadTownEvent(
+                                                    city_id: selectedCity));
+                                          });
+                                          print(selectedCity.toString());
+                                        },
                                       ),
-                                    ),
-                                    filled: true,
-                                    labelText: 'City',
-                                    labelStyle: TextStyle(
-                                      color: Color(0xff072027),
-                                      fontSize: 25,
-                                    ),
-                                    suffix: IconButton(
-                                      icon: const Icon(Icons.close),
-                                      onPressed: () {
-                                        _formKey.currentState!.fields['city']
-                                            ?.reset();
-                                      },
-                                    ),
-                                    hintText: "Select city",
-                                  ),
-                                  isExpanded: true,
-                                  items: cityOptions
-                                      .map((city) => DropdownMenuItem<City>(
-                                            alignment:
-                                                AlignmentDirectional.center,
-                                            value: city,
-                                            child: Text(city.city_name),
-                                          ))
-                                      .toList(),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      selectedCity = value!.city_id;
-                                    });
-                                    print(selectedCity.toString());
-                                  },
-                                ),
-                              );
-                            } else {
-                              return const Center(child: Text("Error"));
-                            }
-                          },
+                                    );
+                                  } else {
+                                    return const Center(child: Text("Error"));
+                                  }
+                                },
+                              ),
+                            ),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.02,
+                            ),
+                          ],
                         ),
                         SizedBox(
                           height: 30,
+                        ),
+                        Container(
+                          height: MediaQuery.of(context).size.height * 0.065,
+                          width: 699,
+                          child: BlocBuilder<TownBloc, TownState>(
+                            builder: (context, state) {
+                              if (state is TownLoadingState) {
+                                return const Center(
+                                    child: CircularProgressIndicator());
+                              }
+                              if (state is TownLoadedState) {
+                                List<Town> townOptions = state.towns;
+                                return SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.08,
+                                  child: FormBuilderDropdown<Town>(
+                                    name: 'town',
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 16,
+                                    ),
+                                    decoration: InputDecoration(
+                                      fillColor: Colors.white,
+                                      border: OutlineInputBorder(),
+                                      focusedBorder: const OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: Colors.blueAccent,
+                                          width: 3,
+                                        ),
+                                      ),
+                                      filled: true,
+                                      labelText: 'City',
+                                      labelStyle: const TextStyle(
+                                        color: Color(0xff072027),
+                                        fontSize: 25,
+                                      ),
+                                      suffix: IconButton(
+                                        icon: const Icon(Icons.close),
+                                        onPressed: () {
+                                          _formKey.currentState!.fields['town']
+                                              ?.reset();
+                                        },
+                                      ),
+                                      hintText: "Select city",
+                                    ),
+                                    isExpanded: true,
+                                    items: townOptions
+                                        .map((town) => DropdownMenuItem<Town>(
+                                              alignment:
+                                                  AlignmentDirectional.center,
+                                              value: town,
+                                              child: Text(town.townName),
+                                            ))
+                                        .toList(),
+                                    onSaved: (value) {
+                                      setState(() {
+                                        selectedTown = value!.townId;
+                                      });
+                                      print(selectedTown.toString());
+                                    },
+                                  ),
+                                );
+                              } else {
+                                return const Center(child: Text("Error"));
+                              }
+                            },
+                          ),
                         ),
                         BlocBuilder<ContactsBloc, ContactsState>(
                           builder: (context, state) {
@@ -192,8 +282,8 @@ class _AddContactScreenState extends State<AddContactScreen> {
                                       'kisi_ad':
                                           _formKey.currentState!.value["name"],
                                       'kisi_id': 0,
-                                      'city_id': 12049,
-                                      'town_id': 2175,
+                                      'city_id': selectedCity,
+                                      'town_id': selectedTown,
                                       'kisi_tel': _phoneNumberController.text,
                                     });
                                     context.read<ContactsBloc>().add(
