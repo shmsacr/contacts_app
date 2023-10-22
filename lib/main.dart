@@ -3,6 +3,7 @@ import 'package:contacts_app/src/core/bloc/city_bloc/city_bloc.dart';
 import 'package:contacts_app/src/core/bloc/city_bloc/city_event.dart';
 import 'package:contacts_app/src/core/bloc/contacts_bloc/contacts_bloc.dart';
 import 'package:contacts_app/src/core/bloc/contacts_bloc/contacts_event.dart';
+import 'package:contacts_app/src/core/bloc/town_bloc.dart';
 import 'package:contacts_app/src/core/data/repository/user/user_repository/user_repository.dart';
 import 'package:contacts_app/src/core/data/repository/user/user_repository/user_repository_impl.dart';
 import 'package:contacts_app/src/core/data/service/city_service/city_service.dart';
@@ -46,6 +47,9 @@ void main() async {
               return AuthenticationBloc(repository)..add(AppLoaded());
             },
           ),
+          BlocProvider<TownBloc>(create: (ctx) {
+            return TownBloc();
+          }),
         ],
         child: MyApp(),
       ),
