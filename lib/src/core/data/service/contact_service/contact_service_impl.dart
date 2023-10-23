@@ -18,7 +18,6 @@ class ContactServiceImpl implements ContactService {
     });
     if (response.statusCode == 200) {
       var responseData = response.data;
-      print("${response.data["kisiler"]["data"]}");
       if (responseData["basari"] == 1 && responseData["durum"] == 1) {
         final List<Map<String, dynamic>> responseData =
             List<Map<String, dynamic>>.from(response.data["kisiler"]["data"]);
