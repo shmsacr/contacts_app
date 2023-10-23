@@ -13,7 +13,6 @@ class CityServiceImpl implements CityService {
       endpoint,
     );
     if (response.statusCode == 200) {
-      print(response.data["iller"]);
       final List<Map<String, dynamic>> responseData =
           List<Map<String, dynamic>>.from(response.data["iller"]);
       final List<City> cities =
