@@ -4,7 +4,8 @@ A new Flutter project.
 
 ## Getting Started
 <div>
-    <img src="assets/app_ss/login.png" alt="Login" width="400"/>
+<img src="assets/app_ss/splash.png" alt="Login" width="300"/>
+    <img src="assets/app_ss/login.png" alt="Login" width="300"/>
     
 </div>
 
@@ -14,8 +15,9 @@ A new Flutter project.
 </div>
 
 <div>
-   <img src="assets/app_ss/add.png" alt="Add Contact" width="300"/>
-    <img src="assets/app_ss/cities.png" alt="Cities" width="300"/>
+   <img src="assets/app_ss/addscrenn.png" alt="Add Contact" width="200"/>
+    <img src="assets/app_ss/addcity.png" alt="Cities" width="200"/>
+<img src="assets/app_ss/town.png" alt="Cities" width="200"/>
 </div>
 
 <div>
