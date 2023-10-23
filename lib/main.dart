@@ -8,8 +8,7 @@ import 'package:contacts_app/src/core/data/repository/user/user_repository/user_
 import 'package:contacts_app/src/core/data/repository/user/user_repository/user_repository_impl.dart';
 import 'package:contacts_app/src/core/data/service/city_service/city_service.dart';
 import 'package:contacts_app/src/core/data/service/city_service/city_service_impl.dart';
-import 'package:contacts_app/src/screens/home/home_screen.dart'; // Import your HomeScreen
-import 'package:contacts_app/src/screens/login/login_screen.dart';
+import 'package:contacts_app/src/screens/splash_screen/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -64,10 +63,14 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
         builder: (context, state) {
-          if (state is AuthenticationSuccess) {
-            return HomeScreen();
+          if (state is AuthenticationFailure) {
+            return Center(
+              child: Text("Error"),
+            );
           }
-          return LoginScreen();
+          return SplashScreen(
+            state: state,
+          );
         },
       ),
     );
