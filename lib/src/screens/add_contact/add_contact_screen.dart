@@ -11,7 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../core/bloc/city_bloc/city_state.dart';
 import '../../core/bloc/contacts_bloc/contacts_event.dart';
 import '../../core/bloc/contacts_bloc/contacts_state.dart';
-import '../../core/bloc/town_bloc.dart';
+import '../../core/bloc/town/town_bloc.dart';
 import '../../core/data/model/city.dart';
 import '../../core/data/model/contacts.dart';
 import '../../core/data/model/town.dart';

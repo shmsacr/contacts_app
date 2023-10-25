@@ -18,9 +18,7 @@ class UserRepositoryImpl implements UserRepository {
       if (responseData["basari"] == 1 && responseData["durum"] == 1) {
         User user = User(email: loginData.email, sifre: loginData.sifre, id: 1);
         DatabaseRepositoryImpl databaseProvider = DatabaseRepositoryImpl();
-        await databaseProvider.open();
         await databaseProvider.insert(user);
-        await databaseProvider.close();
         return user;
       } else {
         throw Exception('API Error: ${responseData['mesaj']}');

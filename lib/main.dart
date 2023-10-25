@@ -3,7 +3,7 @@ import 'package:contacts_app/src/core/bloc/city_bloc/city_bloc.dart';
 import 'package:contacts_app/src/core/bloc/city_bloc/city_event.dart';
 import 'package:contacts_app/src/core/bloc/contacts_bloc/contacts_bloc.dart';
 import 'package:contacts_app/src/core/bloc/contacts_bloc/contacts_event.dart';
-import 'package:contacts_app/src/core/bloc/town_bloc.dart';
+import 'package:contacts_app/src/core/bloc/town/town_bloc.dart';
 import 'package:contacts_app/src/core/data/repository/user/user_repository/user_repository.dart';
 import 'package:contacts_app/src/core/data/repository/user/user_repository/user_repository_impl.dart';
 import 'package:contacts_app/src/core/data/service/city_service/city_service.dart';
@@ -61,18 +61,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
-        builder: (context, state) {
-          if (state is AuthenticationFailure) {
-            return Center(
-              child: Text("Error"),
-            );
-          }
-          return SplashScreen(
-            state: state,
-          );
-        },
-      ),
+      home: SplashScreen(),
     );
   }
 }

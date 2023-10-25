@@ -1,13 +1,13 @@
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../core/bloc/authentication/authenctication_bloc.dart';
 import '../home/home_screen.dart';
 import '../login/login_screen.dart';
 
 class SplashScreen extends StatelessWidget {
-  final AuthenticationState state;
-  SplashScreen({required this.state}) : super();
+  SplashScreen() : super();
   @override
   Widget build(BuildContext context) {
     return AnimatedSplashScreen(
@@ -24,7 +24,21 @@ class SplashScreen extends StatelessWidget {
       ),
       splashIconSize: 350,
       backgroundColor: Colors.blueGrey,
-      nextScreen: state is AuthenticationSuccess ? HomeScreen() : LoginScreen(),
+      nextScreen: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+        builder: (context, state) {
+          if (state is AuthenticationSuccess) {
+            return HomeScreen();
+          } else if (state is AuthenticationNotAuthenticated) {
+            return LoginScreen();
+          } else {
+            return Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+        },
+      ),
       duration: 2000,
       centered: true,
     );
