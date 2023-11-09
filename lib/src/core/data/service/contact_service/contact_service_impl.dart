@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:http_parser/http_parser.dart' show MediaType;
 
 import '../../model/contacts.dart';
@@ -11,11 +12,14 @@ class ContactServiceImpl implements ContactService {
   String endpoint = "http://www.motosikletci.com/api/kisiler";
   Dio dio = Dio();
   @override
-  Future<List<Contacts>> getUsers(User user) async {
+  Future<List<Contacts>> getUsers(User user, [int page = 0]) async {
     Response response = await dio.post(endpoint, queryParameters: {
       'email': user.email,
       'sifre': user.sifre,
+      'page': page,
     });
+    debugPrint("page: $page");
+
     if (response.statusCode == 200) {
       var responseData = response.data;
       if (responseData["basari"] == 1 && responseData["durum"] == 1) {
