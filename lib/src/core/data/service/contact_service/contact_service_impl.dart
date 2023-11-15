@@ -12,7 +12,7 @@ class ContactServiceImpl implements ContactService {
   String endpoint = "http://www.motosikletci.com/api/kisiler";
   Dio dio = Dio();
   @override
-  Future<List<Contacts>> getUsers(User user, [int page = 0]) async {
+  Future<List<Contacts>> getUsers(User user, [int page = 1]) async {
     Response response = await dio.post(endpoint, queryParameters: {
       'email': user.email,
       'sifre': user.sifre,
@@ -65,7 +65,6 @@ class ContactServiceImpl implements ContactService {
           'city_id': contacts.city_id,
           'town_id': contacts.town_id,
           'kisi_tel': contacts.kisi_tel,
-          // Use the uploaded image URL here
         },
         data: formData,
       );
