@@ -18,13 +18,6 @@ class ContactsFetch extends ContactsEvent {
   List<Object?> get props => [];
 }
 
-class LoadContactEvent extends ContactsEvent {
-  final int page;
-  LoadContactEvent({this.page = 1});
-  @override
-  List<Object?> get props => [page];
-}
-
 class ResetContactEvent extends ContactsEvent {
   @override
   List<Object?> get props => [];
