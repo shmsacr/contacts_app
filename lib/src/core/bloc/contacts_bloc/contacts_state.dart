@@ -16,7 +16,7 @@ class ContactsState extends Equatable {
       {this.contact = const <Contacts>[],
       this.hasReachedMax = false,
       this.status = ContactStatus.initial,
-      this.page = 0});
+      this.page = 1});
 
   @override
   List<Object?> get props => [contact, hasReachedMax, status];
@@ -39,16 +39,6 @@ class ContactsState extends Equatable {
 class ContactsLoadingState extends ContactsState {
   @override
   List<Object?> get props => [];
-}
-
-class ContactsLoadedState extends ContactsState {
-  final int? currentPage;
-  final List<Contacts> users;
-
-  ContactsLoadedState(this.users, this.currentPage);
-
-  @override
-  List<Object?> get props => [users, currentPage];
 }
 
 class ContactsSuccessState extends ContactsState {
