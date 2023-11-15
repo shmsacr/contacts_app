@@ -27,11 +27,11 @@ class SplashScreen extends StatelessWidget {
       nextScreen: BlocBuilder<AuthenticationBloc, AuthenticationState>(
         builder: (context, state) {
           if (state is AuthenticationSuccess) {
-            return HomeScreen();
+            return const HomeScreen();
           } else if (state is AuthenticationNotAuthenticated) {
-            return LoginScreen();
+            return const LoginScreen();
           } else {
-            return Scaffold(
+            return const Scaffold(
               body: Center(
                 child: CircularProgressIndicator(),
               ),
