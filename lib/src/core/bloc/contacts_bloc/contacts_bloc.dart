@@ -58,8 +58,10 @@ class ContactsBloc extends Bloc<ContactsEvent, ContactsState> {
       final user = await _userDatabaseProvider.getUserById(1);
       final deleteUser = await _contactService.deleteContact(user!, event.data);
       if (deleteUser) {
-        emit(ContactsLoadingState());
-        await _contactFetch(ContactsFetch(), emit);
+        final updatedContacts = state.contact
+            .where((c) => c.kisi_id != event.data.kisi_id)
+            .toList();
+        emit(state.copyWith(contact: updatedContacts));
       } else {
         emit(ContactsErrorState("Kullanıcı silinemedi"));
       }
@@ -79,7 +81,6 @@ class ContactsBloc extends Bloc<ContactsEvent, ContactsState> {
     try {
       if (state.status == ContactStatus.initial) {
         final contact = await _contactService.getUsers(user!);
-        print(state.contact.length);
         emit(state.copyWith(
             contact: contact,
             hasReachedMax: false,
