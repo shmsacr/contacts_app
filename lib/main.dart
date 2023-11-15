@@ -28,7 +28,7 @@ void main() async {
             create: (ctx) {
               return ContactsBloc()
                 ..add(
-                  LoadUserEvent(),
+                  ContactsFetch(),
                 );
             },
           ),
