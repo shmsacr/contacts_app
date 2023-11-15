@@ -46,31 +46,7 @@ class SearchScreen extends SearchDelegate<Contacts> {
   Widget buildResults(BuildContext context) {
     return StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
-      return ListView.builder(
-          itemCount: contacts.length,
-          itemBuilder: (context, index) {
-            final isdata = contacts[index];
-            return Card(
-              elevation: 10,
-              child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: isdata.cinsiyet == 1
-                        ? Colors.blueAccent
-                        : Colors.pinkAccent,
-                    child: Icon(Icons.person),
-                  ),
-                  title: Text(
-                    isdata.kisi_ad,
-                  ),
-                  subtitle: Text(
-                    isdata.kisi_tel,
-                    style: const TextStyle(
-                        color: Colors.grey, fontWeight: FontWeight.w600),
-                  ),
-                  trailing:
-                      Text(isdata.city_name! + " / " + isdata.town_name!)),
-            );
-          });
+      return customListViewBuilder(contacts: contacts);
     });
   }
 
@@ -94,31 +70,44 @@ class SearchScreen extends SearchDelegate<Contacts> {
     }
     return StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
-      return ListView.builder(
-          itemCount: matchQuery.length,
-          itemBuilder: (context, index) {
-            final isdata = matchQuery[index];
-            return Card(
-              elevation: 10,
-              child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: isdata.cinsiyet == 1
-                        ? Colors.blueAccent
-                        : Colors.pinkAccent,
-                    child: Icon(Icons.person),
-                  ),
-                  title: Text(
-                    isdata.kisi_ad,
-                  ),
-                  subtitle: Text(
-                    isdata.kisi_tel,
-                    style: TextStyle(
-                        color: Colors.grey, fontWeight: FontWeight.w600),
-                  ),
-                  trailing:
-                      Text(isdata.city_name! + " / " + isdata.town_name!)),
-            );
-          });
+      return customListViewBuilder(contacts: matchQuery);
     });
+  }
+}
+
+class customListViewBuilder extends StatelessWidget {
+  const customListViewBuilder({
+    super.key,
+    required this.contacts,
+  });
+
+  final List<Contacts> contacts;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+        itemCount: contacts.length,
+        itemBuilder: (context, index) {
+          final isdata = contacts[index];
+          return Card(
+            elevation: 10,
+            child: ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: isdata.cinsiyet == 1
+                      ? Colors.blueAccent
+                      : Colors.pinkAccent,
+                  child: Icon(Icons.person),
+                ),
+                title: Text(
+                  isdata.kisi_ad,
+                ),
+                subtitle: Text(
+                  isdata.kisi_tel,
+                  style: const TextStyle(
+                      color: Colors.grey, fontWeight: FontWeight.w600),
+                ),
+                trailing: Text(isdata.city_name! + " / " + isdata.town_name!)),
+          );
+        });
   }
 }
