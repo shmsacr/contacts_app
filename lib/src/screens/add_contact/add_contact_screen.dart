@@ -24,8 +24,9 @@ class AddContactScreen extends StatefulWidget {
 }
 
 class _AddContactScreenState extends State<AddContactScreen> {
+  TownBloc? _townBloc;
   final _formKey = GlobalKey<FormBuilderState>();
-  var _phoneNumberController = TextEditingController();
+  final _phoneNumberController = TextEditingController();
   late TextEditingController _controller;
   List<String> genderOptions = ['Male', 'Female', 'Other'];
   File? _uploadFile;
@@ -34,19 +35,21 @@ class _AddContactScreenState extends State<AddContactScreen> {
   @override
   void initState() {
     super.initState();
+    _townBloc = BlocProvider.of<TownBloc>(context);
     _controller = TextEditingController();
   }
 
   @override
   void dispose() {
-    _formKey.currentState?.reset();
+    _formKey.currentState?.dispose();
     _phoneNumberController.dispose();
+    _controller.dispose();
+    _townBloc?.add(ClearTownEvent());
     super.dispose();
   }
 
   Future<void> upLoadCamere() async {
-    XFile? getFile = await ImagePicker()
-        .pickImage(source: ImageSource.camera, imageQuality: 1);
+    XFile? getFile = await ImagePicker().pickImage(source: ImageSource.camera);
     setState(() {
       _uploadFile = File(getFile!.path);
     });
@@ -63,8 +66,8 @@ class _AddContactScreenState extends State<AddContactScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Color(0xff003344),
-          title: Text("Add Contact"),
+          backgroundColor: const Color(0xff003344),
+          title: const Text("Add Contact"),
           centerTitle: true,
         ),
         body: Padding(
@@ -87,16 +90,15 @@ class _AddContactScreenState extends State<AddContactScreen> {
                                   fit: BoxFit.cover,
                                 ),
                               )
-                            : Icon(Icons.person, size: 50),
+                            : const Icon(Icons.person, size: 50),
                       ),
                       Positioned(
                         child: CircleAvatar(
                           backgroundColor: Colors.green,
                           child: IconButton(
-                              onPressed: () => showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) =>
-                                      alertDialog()),
+                              onPressed: () {
+                                buildShowModalBottomSheet(context);
+                              },
                               icon: const Icon(
                                 Icons.add_a_photo,
                                 color: Colors.white,
@@ -109,88 +111,68 @@ class _AddContactScreenState extends State<AddContactScreen> {
                     key: _formKey,
                     child: Column(
                       children: [
-                        SizedBox(
+                        const SizedBox(
                           height: 16,
                         ),
-                        _NameFormBuilder(),
+                        const _NameFormBuilder(),
                         const SizedBox(height: 16.0),
                         _PhoneFormBuilder(
                             phoneNumberController: _phoneNumberController),
-                        SizedBox(
+                        const SizedBox(
                           height: 20,
                         ),
                         Row(
                           children: [
-                            Container(
-                              height:
-                                  MediaQuery.of(context).size.height * 0.065,
-                              width: MediaQuery.of(context).size.width / 2.3,
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width / 2.5,
                               child: BlocBuilder<CityBloc, CityState>(
                                 builder: (context, state) {
                                   if (state is CityLoadedState) {
                                     List<City> cityOptions = state.cities;
-                                    return SizedBox(
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.08,
-                                      child: FormBuilderDropdown<City>(
-                                        name: 'city',
-                                        style: const TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 16,
-                                        ),
-                                        decoration: InputDecoration(
-                                          fillColor: Colors.white,
-                                          border: OutlineInputBorder(),
-                                          focusedBorder:
-                                              const OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color: Colors.blueAccent,
-                                              width: 3,
-                                            ),
-                                          ),
-                                          filled: true,
-                                          labelText: 'City',
-                                          labelStyle: const TextStyle(
-                                            color: Color(0xff072027),
-                                            fontSize: 18,
-                                          ),
-                                          suffix: IconButton(
-                                            icon: const Icon(Icons.close),
-                                            onPressed: () {
-                                              _formKey
-                                                  .currentState!.fields['city']
-                                                  ?.reset();
-                                            },
-                                          ),
-                                          hintText: "Select city",
-                                        ),
-                                        isExpanded: true,
-                                        items: cityOptions
-                                            .map((city) =>
-                                                DropdownMenuItem<City>(
-                                                  alignment:
-                                                      AlignmentDirectional
-                                                          .center,
-                                                  value: city,
-                                                  child: Text(city.city_name),
-                                                  onTap: () {
-                                                    setState(() {
-                                                      selectedCity =
-                                                          city.city_id;
-                                                      BlocProvider.of<TownBloc>(
-                                                              context)
-                                                          .add(LoadTownEvent(
-                                                              city_id:
-                                                                  selectedCity));
-                                                    });
-                                                  },
-                                                ))
-                                            .toList(),
+                                    return FormBuilderDropdown<City>(
+                                      name: 'city',
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 18,
                                       ),
+                                      decoration: const InputDecoration(
+                                        fillColor: Colors.white,
+                                        border: OutlineInputBorder(),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                            color: Colors.blueAccent,
+                                            width: 3,
+                                          ),
+                                        ),
+                                        filled: true,
+                                        labelText: 'City',
+                                        labelStyle: TextStyle(
+                                          color: Color(0xff072027),
+                                          fontSize: 18,
+                                        ),
+                                        hintText: "Select city",
+                                      ),
+                                      items: cityOptions
+                                          .map((city) => DropdownMenuItem<City>(
+                                                alignment:
+                                                    AlignmentDirectional.center,
+                                                value: city,
+                                                child: Text(city.city_name),
+                                                onTap: () {
+                                                  setState(() {
+                                                    selectedCity = city.city_id;
+                                                    BlocProvider.of<TownBloc>(
+                                                            context)
+                                                        .add(LoadTownEvent(
+                                                            city_id:
+                                                                selectedCity));
+                                                  });
+                                                },
+                                              ))
+                                          .toList(),
                                     );
                                   } else {
-                                    return Container(
+                                    return SizedBox(
                                       height:
                                           MediaQuery.of(context).size.height *
                                               0.065,
@@ -220,80 +202,58 @@ class _AddContactScreenState extends State<AddContactScreen> {
                                 },
                               ),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               width: 10,
                             ),
-                            Container(
-                              height:
-                                  MediaQuery.of(context).size.height * 0.065,
-                              width: MediaQuery.of(context).size.width / 2.3,
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width / 2.5,
                               child: BlocBuilder<TownBloc, TownState>(
                                 builder: (context, state) {
                                   if (state is TownLoadedState) {
                                     List<Town> townOptions = state.towns;
-                                    return SizedBox(
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.08,
-                                      child: FormBuilderDropdown<Town>(
-                                        name: 'town',
-                                        style: const TextStyle(
-                                          color: Colors.black,
+                                    return FormBuilderDropdown<Town>(
+                                      name: 'town',
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 18,
+                                      ),
+                                      decoration: const InputDecoration(
+                                        fillColor: Colors.white,
+                                        border: OutlineInputBorder(),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                            color: Colors.blueAccent,
+                                            width: 3,
+                                          ),
+                                        ),
+                                        filled: true,
+                                        labelText: 'Town',
+                                        labelStyle: TextStyle(
+                                          color: Color(0xff072027),
                                           fontSize: 16,
                                         ),
-                                        decoration: InputDecoration(
-                                          fillColor: Colors.white,
-                                          border: OutlineInputBorder(),
-                                          focusedBorder:
-                                              const OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color: Colors.blueAccent,
-                                              width: 3,
-                                            ),
-                                          ),
-                                          filled: true,
-                                          labelText: 'Town',
-                                          labelStyle: const TextStyle(
-                                            color: Color(0xff072027),
-                                            fontSize: 18,
-                                          ),
-                                          suffix: IconButton(
-                                            icon: const Icon(Icons.close),
-                                            onPressed: () {
-                                              _formKey
-                                                  .currentState!.fields['town']
-                                                  ?.reset();
-                                            },
-                                          ),
-                                          hintText: "Select city",
-                                        ),
-                                        isExpanded: true,
-                                        items: townOptions
-                                            .map((town) =>
-                                                DropdownMenuItem<Town>(
-                                                  alignment:
-                                                      AlignmentDirectional
-                                                          .center,
-                                                  value: town,
-                                                  child: Text(town.townName),
-                                                  onTap: () {
-                                                    setState(() {
-                                                      selectedTown =
-                                                          town.townId;
-                                                    });
-                                                  },
-                                                ))
-                                            .toList(),
+                                        hintText: "Select town",
                                       ),
+                                      isExpanded: true,
+                                      items: townOptions
+                                          .map((town) => DropdownMenuItem<Town>(
+                                                alignment:
+                                                    AlignmentDirectional.center,
+                                                value: town,
+                                                child: Text(town.townName),
+                                                onTap: () {
+                                                  setState(() {
+                                                    selectedTown = town.townId;
+                                                  });
+                                                },
+                                              ))
+                                          .toList(),
                                     );
                                   }
                                   if (state is TownErrorState) {
                                     return const Center(child: Text("Error"));
                                   } else {
-                                    return Container(
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.065,
+                                    return SizedBox(
                                       width: MediaQuery.of(context).size.width /
                                           2.2,
                                       child: const TextField(
@@ -322,8 +282,8 @@ class _AddContactScreenState extends State<AddContactScreen> {
                             ),
                           ],
                         ),
-                        SizedBox(
-                          height: 30,
+                        const SizedBox(
+                          height: 20,
                         ),
                         BlocBuilder<ContactsBloc, ContactsState>(
                           builder: (context, state) {
@@ -341,7 +301,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                                       'kisi_tel': _phoneNumberController.text,
                                     });
                                     context.read<ContactsBloc>().add(
-                                        PostUserEvent(
+                                        PostContactEvent(
                                             data: user, file: _uploadFile));
                                     final state = await context
                                         .read<ContactsBloc>()
@@ -350,6 +310,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                                             state is ContactsSuccessState ||
                                             state is ContactsErrorState);
                                     if (state is ContactsSuccessState) {
+                                      // ignore: use_build_context_synchronously
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
                                         SnackBar(
@@ -357,6 +318,14 @@ class _AddContactScreenState extends State<AddContactScreen> {
                                           "User created: ${user.kisi_ad}",
                                         )),
                                       );
+                                      _formKey.currentState?.reset();
+                                      _phoneNumberController.clear();
+                                      _formKey.currentState!.fields['city']
+                                          ?.reset();
+                                      _townBloc?.add(ClearTownEvent());
+                                      setState(() {
+                                        _uploadFile = null;
+                                      });
                                     } else if (state is ContactsErrorState) {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
@@ -368,7 +337,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                                     }
                                     context
                                         .read<ContactsBloc>()
-                                        .add(LoadUserEvent());
+                                        .add(ContactsFetch());
                                   } else {
                                     debugPrint('Invalid');
                                   }
@@ -376,7 +345,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.green,
                                 ),
-                                child: Text(
+                                child: const Text(
                                   'Create',
                                   style: TextStyle(color: Colors.white),
                                 ));
@@ -392,18 +361,23 @@ class _AddContactScreenState extends State<AddContactScreen> {
         ));
   }
 
-  Widget alertDialog() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        SizedBox(
-          height: MediaQuery.of(context).size.height * 0.3,
-          width: MediaQuery.of(context).size.width * 0.5,
-          child: AlertDialog(
-            title: const Text('Lütfen yükleme tipini seçiniz'),
-            content: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+  Future<void> buildShowModalBottomSheet(BuildContext context) {
+    return showModalBottomSheet<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return SizedBox(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height * 0.2,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
+                const Text(
+                  "Lütfen yükleme tipini seçiniz",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.02,
+                ),
                 InkWell(
                   onTap: () {
                     upLoadCamere();
@@ -423,6 +397,9 @@ class _AddContactScreenState extends State<AddContactScreen> {
                       ),
                     ],
                   ),
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.02,
                 ),
                 InkWell(
                   onTap: () {
@@ -446,10 +423,8 @@ class _AddContactScreenState extends State<AddContactScreen> {
                 )
               ],
             ),
-          ),
-        ),
-      ],
-    );
+          );
+        });
   }
 }
 
