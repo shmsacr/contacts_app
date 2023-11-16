@@ -138,64 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 10,
         child: ListTile(
             onTap: () {
-              showModalBottomSheet<void>(
-                  backgroundColor: Colors.transparent,
-                  context: context,
-                  builder: (BuildContext context) {
-                    return Stack(
-                      alignment: Alignment.topCenter,
-                      children: [
-                        Stack(
-                          children: [
-                            Container(
-                              color: const Color(0xff003344),
-                              margin: const EdgeInsets.only(top: 100),
-                              width: MediaQuery.of(context).size.width,
-                              height: MediaQuery.of(context).size.height * 0.3,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    isdata.kisi_ad,
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      color: _textColor,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Text(
-                                    isdata.kisi_tel,
-                                    style: TextStyle(
-                                      color: _textColor,
-                                      fontSize: 20,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Text(
-                                    "${isdata.city_name!} / ${isdata.town_name!}",
-                                    style: TextStyle(
-                                      color: _textColor,
-                                      fontSize: 20,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        Positioned(
-                          top: 50,
-                          child: CircleAvatar(
-                            radius: 50,
-                            backgroundColor: isdata.cinsiyet == 1
-                                ? Colors.blueAccent
-                                : Colors.pinkAccent,
-                            child: const Icon(Icons.person, size: 50),
-                          ),
-                        ),
-                      ],
-                    );
-                  });
+              buildShowModalBottomSheet(context, isdata, _textColor);
             },
             leading: CircleAvatar(
               backgroundColor:
@@ -213,6 +156,68 @@ class _HomeScreenState extends State<HomeScreen> {
             trailing: Text("${isdata.city_name!} / ${isdata.town_name!}")),
       ),
     );
+  }
+
+  Future<void> buildShowModalBottomSheet(
+      BuildContext context, Contacts isdata, Color _textColor) {
+    return showModalBottomSheet<void>(
+        backgroundColor: Colors.transparent,
+        context: context,
+        builder: (BuildContext context) {
+          return Stack(
+            alignment: Alignment.topCenter,
+            children: [
+              Stack(
+                children: [
+                  Container(
+                    color: const Color(0xff003344),
+                    margin: const EdgeInsets.only(top: 100),
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height * 0.3,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          isdata.kisi_ad,
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: _textColor,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          isdata.kisi_tel,
+                          style: TextStyle(
+                            color: _textColor,
+                            fontSize: 20,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          "${isdata.city_name!} / ${isdata.town_name!}",
+                          style: TextStyle(
+                            color: _textColor,
+                            fontSize: 20,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              Positioned(
+                top: 50,
+                child: CircleAvatar(
+                  radius: 50,
+                  backgroundColor: isdata.cinsiyet == 1
+                      ? Colors.blueAccent
+                      : Colors.pinkAccent,
+                  child: const Icon(Icons.person, size: 50),
+                ),
+              ),
+            ],
+          );
+        });
   }
 
   _showAlertDialog(BuildContext context, Contacts isdata) {
@@ -273,7 +278,7 @@ class _Positioned extends StatelessWidget {
   Widget build(BuildContext context) {
     return Positioned(
       top: context.general.mediaQuery.size.height * 0.035,
-      left: context.general.mediaQuery.size.width * 0.75,
+      left: context.general.mediaQuery.size.width * .7,
       right: 0,
       child: Row(
         children: [
