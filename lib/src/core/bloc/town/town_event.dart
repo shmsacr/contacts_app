@@ -8,3 +8,8 @@ class LoadTownEvent extends TownEvent {
   @override
   List<Object?> get props => [city_id];
 }
+
+class ClearTownEvent extends TownEvent {
+  @override
+  List<Object?> get props => [];
+}
