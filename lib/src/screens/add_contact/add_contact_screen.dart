@@ -67,7 +67,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
     return Scaffold(
         appBar: AppBar(
           backgroundColor: const Color(0xff003344),
-          title: const Text("Add Contact"),
+          title: const Text("Rehbere Ekle"),
           centerTitle: true,
         ),
         body: Padding(
@@ -145,12 +145,12 @@ class _AddContactScreenState extends State<AddContactScreen> {
                                           ),
                                         ),
                                         filled: true,
-                                        labelText: 'City',
+                                        labelText: 'Sehir',
                                         labelStyle: TextStyle(
                                           color: Color(0xff072027),
                                           fontSize: 18,
                                         ),
-                                        hintText: "Select city",
+                                        hintText: "Sehir Sec",
                                       ),
                                       items: cityOptions
                                           .map((city) => DropdownMenuItem<City>(
@@ -190,7 +190,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                                             ),
                                           ),
                                           filled: true,
-                                          labelText: 'City',
+                                          labelText: 'Sehir',
                                           labelStyle: TextStyle(
                                             color: Color(0xff072027),
                                             fontSize: 18,
@@ -227,12 +227,12 @@ class _AddContactScreenState extends State<AddContactScreen> {
                                           ),
                                         ),
                                         filled: true,
-                                        labelText: 'Town',
+                                        labelText: 'Ilce',
                                         labelStyle: TextStyle(
                                           color: Color(0xff072027),
                                           fontSize: 16,
                                         ),
-                                        hintText: "Select town",
+                                        hintText: "Ilce Seç",
                                       ),
                                       isExpanded: true,
                                       items: townOptions
@@ -268,7 +268,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                                             ),
                                           ),
                                           filled: true,
-                                          labelText: 'Town',
+                                          labelText: 'Ilce',
                                           labelStyle: TextStyle(
                                             color: Color(0xff072027),
                                             fontSize: 18,
@@ -346,7 +346,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                                   backgroundColor: Colors.green,
                                 ),
                                 child: const Text(
-                                  'Create',
+                                  'Olustur',
                                   style: TextStyle(color: Colors.white),
                                 ));
                           },
