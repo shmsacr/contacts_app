@@ -92,17 +92,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Padding(
                         padding: context.padding.low,
                         child: ListView.builder(
+                          physics: const BouncingScrollPhysics(),
                           controller: _scrollController,
                           itemCount: state.hasReachedMax
-                              ? state.contact.length
+                              ? state.contact.length + 2
                               : state.contact.length + 1,
                           itemBuilder: (context, index) {
-                            if (index < state.contact.length) {
+                            if (index >= state.contact.length) {
+                              return const IndicatorWidget();
+                            } else {
                               final user = state.contact[index];
                               return buildPadding(context, user);
-                            } else {
-                              // Loading indicator for infinite scrolling
-                              return const IndicatorWidget();
                             }
                           },
                         ),
@@ -140,11 +140,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onTap: () {
               buildShowModalBottomSheet(context, isdata, _textColor);
             },
-            leading: CircleAvatar(
-              backgroundColor:
-                  isdata.cinsiyet == 1 ? Colors.blueAccent : Colors.pinkAccent,
-              child: const Icon(Icons.person),
-            ),
+            leading: userDetails(isdata.resim, isdata.cinsiyet, 25),
             title: Text(
               isdata.kisi_ad,
             ),
@@ -156,6 +152,26 @@ class _HomeScreenState extends State<HomeScreen> {
             trailing: Text("${isdata.city_name!} / ${isdata.town_name!}")),
       ),
     );
+  }
+
+  Widget userDetails(String? isPic, int? isCinsiyet, double radius) {
+    if (isPic == null) {
+      return CircleAvatar(
+        radius: radius,
+        backgroundColor:
+            isCinsiyet == 1 ? Colors.blueAccent : Colors.pinkAccent,
+        child: Icon(
+          Icons.person,
+          size: radius,
+        ),
+      );
+    } else {
+      return CircleAvatar(
+        radius: radius,
+        backgroundImage:
+            NetworkImage('http://www.motosikletci.com/upload/kisi/${isPic}'),
+      );
+    }
   }
 
   Future<void> buildShowModalBottomSheet(
@@ -207,13 +223,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               Positioned(
                 top: 50,
-                child: CircleAvatar(
-                  radius: 50,
-                  backgroundColor: isdata.cinsiyet == 1
-                      ? Colors.blueAccent
-                      : Colors.pinkAccent,
-                  child: const Icon(Icons.person, size: 50),
-                ),
+                child: userDetails(isdata.resim, isdata.cinsiyet, 50),
               ),
             ],
           );
