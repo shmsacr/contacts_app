@@ -10,14 +10,17 @@ A new Flutter project.
 </div>
 
 <div>
-    <img src="assets/app_ss/home.png" alt="Home" width="300"/>
-    <img src="assets/app_ss/delete.png" alt="Delete" width="300"/>
+    <img src="assets/app_ss/home.png" alt="Home" width="200"/>
+    <img src="assets/app_ss/delete.png" alt="Delete" width="200"/>
+    <img src="assets/app_ss/details.png" alt="Details" width="200"/>
+
 </div>
 
 <div>
-   <img src="assets/app_ss/addscrenn.png" alt="Add Contact" width="200"/>
+   <img src="assets/app_ss/addcontact.png" alt="Add Contact" width="200"/>
     <img src="assets/app_ss/addcity.png" alt="Cities" width="200"/>
-<img src="assets/app_ss/town.png" alt="Cities" width="200"/>
+    <img src="assets/app_ss/town.png" alt="Cities" width="200"/>
+    <img src="assets/app_ss/cameredialog.png" alt="Cities" width="200"/>
 </div>
 
 <div>
